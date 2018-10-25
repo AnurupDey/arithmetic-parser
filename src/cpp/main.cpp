@@ -1,12 +1,7 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <vector>
 #include <cctype>
-
-enum LexState{
-    LSNONE
-};
 
 enum TokenType{
     TTNONE,
