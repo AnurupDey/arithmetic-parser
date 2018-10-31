@@ -3,28 +3,7 @@
 #include <vector>
 #include <cctype>
 
-
-enum TokenType{
-    TTNONE,
-    TTNUMBER,
-    TTOPERATOR,
-    TTBRACKET
-};
-
-/*-----------------------------------------------------------------------------
-Representation of a token. A token is the smallest individual unit of 
-information that carries any meaning. These in this case are either numbers,
-operators or brackets.
------------------------------------------------------------------------------*/
-struct Token{
-    Token(TokenType _type, std::string _value){
-        type = _type;
-        value = _value;
-    }
-
-    TokenType type;
-    std::string value;
-};
+#include "ParseTree.h"
 
 /*-----------------------------------------------------------------------------
 Helper function to extract numbers from an input string. Will Extract decimal 
@@ -78,8 +57,101 @@ std::vector<Token> tokenize(std::string input){
         }
     }
 
+    tokens.emplace_back(TTEND,"");
     return tokens;
 } 
+
+
+#define CRASH() {std::cout << "Controlled Crash\n"; int* ptr = nullptr; *ptr = 0;};
+
+ParseNode parsePrimary(std::vector<Token>::iterator& tokenIt);
+
+ParseNode parseTerm(std::vector<Token>::iterator& tokenIt){
+    ParseNode node;
+    node.name = "Term";
+    node.subNodes.push_back(parsePrimary(tokenIt));
+    if(tokenIt->type != TTEND){
+        if(tokenIt->type==TTBRACKET && tokenIt->value == ")"){
+            tokenIt++;
+        } else if(tokenIt->type == TTOPERATOR){
+            if(tokenIt->value == "*" || tokenIt->value == "/"){
+                node.tokens.push_back(*tokenIt);
+                tokenIt++;
+                node.subNodes.push_back(parseTerm(tokenIt));
+            } else CRASH();
+        } else CRASH();
+    }
+    return node;
+}
+
+ParseNode parseExpression(std::vector<Token>::iterator& tokenIt){
+    ParseNode node;
+    node.name = "Expression";
+    node.subNodes.push_back(parseTerm(tokenIt));
+    if(tokenIt->type != TTEND && (tokenIt->type!=TTBRACKET && tokenIt->value != ")")){
+        if(tokenIt->type == TTOPERATOR){
+            if(tokenIt->value == "+" || tokenIt->value == "-"){
+                node.tokens.push_back(*tokenIt);
+                tokenIt++;
+                node.subNodes.push_back(parseExpression(tokenIt));
+            } else CRASH();
+        } else CRASH();
+    }
+    return node;
+}
+
+ParseNode parsePrimary(std::vector<Token>::iterator& tokenIt){
+    ParseNode node;
+    node.name = "Primary";
+    if(tokenIt->type == TTNUMBER){
+        node.tokens.push_back(*tokenIt);
+        tokenIt++;
+    } else if(tokenIt->type == TTOPERATOR){
+        if(tokenIt->value == "+" || tokenIt->value == "-"){
+            node.tokens.push_back(*tokenIt);
+            tokenIt++;
+            if(tokenIt->type == TTNUMBER){
+                node.tokens.push_back(*tokenIt);
+                tokenIt++;
+            } else CRASH();
+        }
+    } else if(tokenIt->type == TTBRACKET && tokenIt->value == "("){
+        tokenIt++;
+        node.subNodes.push_back(parseExpression(tokenIt));
+        tokenIt++; //skip the closing bracket.
+    } else CRASH();
+    return node;
+}
+
+ParseNode parse(std::vector<Token>::iterator tokenIt){
+    ParseNode curNode = parseExpression(tokenIt);
+    return curNode;
+}
+
+
+void DispNode(ParseNode& node, int l = 0){
+    for(int i = 0; i < l; i++) std::cout << "\t";
+    std::cout << "Node: \n";
+    for(int i = 0; i < l; i++) std::cout << "\t";
+    std::cout << "Name: " << node.name << std::endl;
+
+    if(node.tokens.size()){
+        for(int i = 0; i < l; i++) std::cout << "\t";
+        std::cout << "Tokens: \n";
+        for(auto& token : node.tokens){
+            for(int i = 0; i < l; i++) std::cout << "\t";
+            std::cout << '[' << token.type << ',' << token.value  << ']' << std::endl;
+        }
+    }
+
+    if(node.subNodes.size()){
+        for(int i = 0; i < l; i++) std::cout << "\t";
+        std::cout << "SubNodes: \n";
+        for(auto& subnode : node.subNodes){
+            DispNode(subnode,l+1);
+        }
+    }
+}
 
 /*-----------------------------------------------------------------------------
 Program driver. 
@@ -105,7 +177,8 @@ int main(){
     }
 
     //time to parse.
-
+    ParseNode exp = parse(tokens.begin());
+    DispNode(exp);
     in.close();
     return 0;
 }
