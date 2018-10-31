@@ -3,7 +3,7 @@
 #include <vector>
 #include <cctype>
 
-#include "ParseTree.h"
+#include "Parser.h"
 
 /*-----------------------------------------------------------------------------
 Helper function to extract numbers from an input string. Will Extract decimal 
@@ -61,73 +61,7 @@ std::vector<Token> tokenize(std::string input){
     return tokens;
 } 
 
-
 #define CRASH() {std::cout << "Controlled Crash\n"; int* ptr = nullptr; *ptr = 0;};
-
-ParseNode parsePrimary(std::vector<Token>::iterator& tokenIt);
-
-ParseNode parseTerm(std::vector<Token>::iterator& tokenIt){
-    ParseNode node;
-    node.name = "Term";
-    node.subNodes.push_back(parsePrimary(tokenIt));
-    if(tokenIt->type != TTEND){
-        if(tokenIt->type==TTBRACKET && tokenIt->value == ")"){
-            tokenIt++;
-        } else if(tokenIt->type == TTOPERATOR){
-            if(tokenIt->value == "*" || tokenIt->value == "/"){
-                node.tokens.push_back(*tokenIt);
-                tokenIt++;
-                node.subNodes.push_back(parseTerm(tokenIt));
-            } else CRASH();
-        } else CRASH();
-    }
-    return node;
-}
-
-ParseNode parseExpression(std::vector<Token>::iterator& tokenIt){
-    ParseNode node;
-    node.name = "Expression";
-    node.subNodes.push_back(parseTerm(tokenIt));
-    if(tokenIt->type != TTEND && (tokenIt->type!=TTBRACKET && tokenIt->value != ")")){
-        if(tokenIt->type == TTOPERATOR){
-            if(tokenIt->value == "+" || tokenIt->value == "-"){
-                node.tokens.push_back(*tokenIt);
-                tokenIt++;
-                node.subNodes.push_back(parseExpression(tokenIt));
-            } else CRASH();
-        } else CRASH();
-    }
-    return node;
-}
-
-ParseNode parsePrimary(std::vector<Token>::iterator& tokenIt){
-    ParseNode node;
-    node.name = "Primary";
-    if(tokenIt->type == TTNUMBER){
-        node.tokens.push_back(*tokenIt);
-        tokenIt++;
-    } else if(tokenIt->type == TTOPERATOR){
-        if(tokenIt->value == "+" || tokenIt->value == "-"){
-            node.tokens.push_back(*tokenIt);
-            tokenIt++;
-            if(tokenIt->type == TTNUMBER){
-                node.tokens.push_back(*tokenIt);
-                tokenIt++;
-            } else CRASH();
-        }
-    } else if(tokenIt->type == TTBRACKET && tokenIt->value == "("){
-        tokenIt++;
-        node.subNodes.push_back(parseExpression(tokenIt));
-        tokenIt++; //skip the closing bracket.
-    } else CRASH();
-    return node;
-}
-
-ParseNode parse(std::vector<Token>::iterator tokenIt){
-    ParseNode curNode = parseExpression(tokenIt);
-    return curNode;
-}
-
 
 void DispNode(ParseNode& node, int l = 0){
     for(int i = 0; i < l; i++) std::cout << "\t";
@@ -177,7 +111,9 @@ int main(){
     }
 
     //time to parse.
-    ParseNode exp = parse(tokens.begin());
+    Parser parser;
+    ParseNode exp = parser.parse(tokens.begin());
+
     DispNode(exp);
     in.close();
     return 0;

@@ -6,10 +6,7 @@
 
 #include "Token.h"
 
-class ParseNode {
-public:
-//private:
-    ParseNode* parent;
+struct ParseNode {
     std::string name;
 
     std::vector<ParseNode> subNodes;
