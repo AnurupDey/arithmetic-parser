@@ -7,7 +7,7 @@
 ParseNode Parser::parseTerm(std::vector<Token>::iterator& tokenIt){
     ParseNode node;
     node.name = "Term";
-    node.subNodes.push_back(parsePrimary(tokenIt));
+    node.subNodes.push_back(parseFactor(tokenIt));
     while(tokenIt->type != TTEND){
         if(tokenIt->type==TTBRACKET && tokenIt->value == ")"){
             break;
@@ -15,7 +15,7 @@ ParseNode Parser::parseTerm(std::vector<Token>::iterator& tokenIt){
             if(tokenIt->value == "*" || tokenIt->value == "/"){
                 node.tokens.push_back(*tokenIt);
                 tokenIt++;
-                node.subNodes.push_back(parsePrimary(tokenIt));
+                node.subNodes.push_back(parseFactor(tokenIt));
             } else break;
         } else CRASH();
     }
@@ -38,9 +38,9 @@ ParseNode Parser::parseExpression(std::vector<Token>::iterator& tokenIt){
     return node;
 }
 
-ParseNode Parser::parsePrimary(std::vector<Token>::iterator& tokenIt){
+ParseNode Parser::parseFactor(std::vector<Token>::iterator& tokenIt){
     ParseNode node;
-    node.name = "Primary";
+    node.name = "Factor";
     if(tokenIt->type == TTNUMBER){
         node.tokens.push_back(*tokenIt);
         tokenIt++;
