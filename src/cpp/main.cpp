@@ -89,6 +89,60 @@ void DispNode(ParseNode& node, int l = 0){
     std::cout << "}\n";
 }
 
+
+
+double solve(ParseNode& node){
+    if(node.name == "Expression"){
+        double sum = solve(node.subNodes[0]); 
+        //expressions are expected to have at least one term
+        for(int i=1;i<node.subNodes.size();i++){
+            if(node.tokens[i-1].value == "+")
+                sum += solve(node.subNodes[i]);
+            else if(node.tokens[i-1].value == "-"){
+                sum -= solve(node.subNodes[i]);
+            }
+        }
+        return sum;
+    } else if (node.name == "Term"){
+        double product = solve(node.subNodes[0]); 
+        //Terms are expected to have at least one factor
+        for(int i=1;i<node.subNodes.size();i++){
+            if(node.tokens[i-1].value == "*")
+                product *= solve(node.subNodes[i]);
+            else if(node.tokens[i-1].value == "/"){
+                product /= solve(node.subNodes[i]);
+            }
+        }
+        return product;
+    } else if (node.name == "Factor"){
+        if(node.tokens.size() == 0){
+            //we have one expression inside this factor
+            return solve(node.subNodes[0]);
+        } else if(node.tokens.size() == 1){
+            //its a single number.
+            return atof(node.tokens[0].value.c_str());
+        } else if(node.tokens.size() == 2){
+            //we have a sign followed by a number
+            if(node.tokens[0].value == "-"){
+                return -atof(node.tokens[1].value.c_str());
+            } else {
+                return atof(node.tokens[1].value.c_str());
+            }
+            //NOTE: skipping error check here.
+        } else {
+            //wuh?
+        }
+    } else {
+        //wuh?
+    }
+}
+
+
+
+
+
+
+
 /*-----------------------------------------------------------------------------
 Program driver. 
 -----------------------------------------------------------------------------*/
@@ -120,6 +174,10 @@ int main(){
 
     std::cout << std::endl << std::endl << "Parsed Tree:\n";
     DispNode(exp);
+
+    //lets solve!
+    double answer = solve(exp);
+    std::cout << "\n\nAnswer = " << answer << std::endl;
     in.close();
     return 0;
 }
