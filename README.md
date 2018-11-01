@@ -35,6 +35,7 @@ Factor:
         floating-point-number
         "+" floating-point-number
         "-" floating-point-number
+        "(" Expression ")"
 ```
 Anything not expected and the parser is programmed to intentionally crash.
 
