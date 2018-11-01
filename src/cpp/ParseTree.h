@@ -6,6 +6,10 @@
 
 #include "Token.h"
 
+/*-----------------------------------------------------------------------------
+Node of a Parse-Tree. This Tree structure is theoretically capable of 
+representing any Parsed Tree Data, not just Arithmatic expressions.
+-----------------------------------------------------------------------------*/
 struct ParseNode {
     std::string name;
 

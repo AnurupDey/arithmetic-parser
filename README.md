@@ -25,12 +25,12 @@ The parser expects the input expressions to follow the following grammar:
 ```
 Expression:
         Term
-        Term "+" Expression
-        Term "-" Expression
+        Term "+" Term
+        Term "-" Term
 Term:
         Factor
-        Factor "*" Term
-        Factor "/" Term
+        Factor "*" Factor
+        Factor "/" Factor
 Factor:
         floating-point-number
         "+" floating-point-number

@@ -61,8 +61,6 @@ std::vector<Token> tokenize(std::string input){
     return tokens;
 } 
 
-#define CRASH() {std::cout << "Controlled Crash\n"; int* ptr = nullptr; *ptr = 0;};
-
 void DispNode(ParseNode& node, int l = 0){
     for(int i = 0; i < l; i++) std::cout << "\t";
     std::cout << "{\n";
@@ -88,8 +86,6 @@ void DispNode(ParseNode& node, int l = 0){
     for(int i = 0; i < l; i++) std::cout << "\t";
     std::cout << "}\n";
 }
-
-
 
 double solve(ParseNode& node){
     if(node.name == "Expression"){
@@ -130,18 +126,12 @@ double solve(ParseNode& node){
             }
             //NOTE: skipping error check here.
         } else {
-            //wuh?
+            //wuh? TODO: Error handling
         }
     } else {
-        //wuh?
+        //wuh? TODO: Error handling
     }
 }
-
-
-
-
-
-
 
 /*-----------------------------------------------------------------------------
 Program driver. 
