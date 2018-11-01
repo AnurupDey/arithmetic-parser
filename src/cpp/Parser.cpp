@@ -8,8 +8,8 @@
 Parses a Term according to the grammar rule
 Term:
     Factor
-    Factor "*" Factor
-    Factor "/" Factor
+    Factor "*" Term
+    Factor "/" Term
 PARAM:
 [IN/OUT]    tokenIt -   Iterator to the token stream, set at the position in
                         the stream from which to start parsing. This iterator
@@ -40,8 +40,8 @@ ParseNode Parser::parseTerm(std::vector<Token>::iterator& tokenIt){
 Parses an Expression according to the grammar rule
 Expression:
     Term
-    Term "*" Term
-    Term "/" Term
+    Term "*" Expression
+    Term "/" Expression
 PARAM:
 [IN/OUT]    tokenIt -   Iterator to the token stream, set at the position in
                         the stream from which to start parsing. This iterator
