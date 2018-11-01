@@ -8,15 +8,15 @@ ParseNode Parser::parseTerm(std::vector<Token>::iterator& tokenIt){
     ParseNode node;
     node.name = "Term";
     node.subNodes.push_back(parsePrimary(tokenIt));
-    if(tokenIt->type != TTEND){
+    while(tokenIt->type != TTEND){
         if(tokenIt->type==TTBRACKET && tokenIt->value == ")"){
-            tokenIt++;
+            break;
         } else if(tokenIt->type == TTOPERATOR){
             if(tokenIt->value == "*" || tokenIt->value == "/"){
                 node.tokens.push_back(*tokenIt);
                 tokenIt++;
-                node.subNodes.push_back(parseTerm(tokenIt));
-            } else CRASH();
+                node.subNodes.push_back(parsePrimary(tokenIt));
+            } else break;
         } else CRASH();
     }
     return node;
@@ -26,13 +26,13 @@ ParseNode Parser::parseExpression(std::vector<Token>::iterator& tokenIt){
     ParseNode node;
     node.name = "Expression";
     node.subNodes.push_back(parseTerm(tokenIt));
-    if(tokenIt->type != TTEND && (tokenIt->type!=TTBRACKET && tokenIt->value != ")")){
+    while(tokenIt->type != TTEND && (tokenIt->type!=TTBRACKET && tokenIt->value != ")")){
         if(tokenIt->type == TTOPERATOR){
             if(tokenIt->value == "+" || tokenIt->value == "-"){
                 node.tokens.push_back(*tokenIt);
                 tokenIt++;
-                node.subNodes.push_back(parseExpression(tokenIt));
-            } else CRASH();
+                node.subNodes.push_back(parseTerm(tokenIt));
+            } else CRASH()
         } else CRASH();
     }
     return node;
@@ -56,6 +56,8 @@ ParseNode Parser::parsePrimary(std::vector<Token>::iterator& tokenIt){
     } else if(tokenIt->type == TTBRACKET && tokenIt->value == "("){
         tokenIt++;
         node.subNodes.push_back(parseExpression(tokenIt));
+        if(!(tokenIt->type == TTBRACKET && tokenIt->value == ")"))
+            CRASH(); //we have to expect this.
         tokenIt++; //skip the closing bracket.
     } else CRASH();
     return node;

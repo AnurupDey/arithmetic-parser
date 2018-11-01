@@ -65,26 +65,28 @@ std::vector<Token> tokenize(std::string input){
 
 void DispNode(ParseNode& node, int l = 0){
     for(int i = 0; i < l; i++) std::cout << "\t";
-    std::cout << "Node: \n";
-    for(int i = 0; i < l; i++) std::cout << "\t";
-    std::cout << "Name: " << node.name << std::endl;
+    std::cout << "{\n";
+    for(int i = 0; i < l+1; i++) std::cout << "\t";
+    std::cout << node.name << std::endl;
 
     if(node.tokens.size()){
-        for(int i = 0; i < l; i++) std::cout << "\t";
-        std::cout << "Tokens: \n";
+        //
         for(auto& token : node.tokens){
-            for(int i = 0; i < l; i++) std::cout << "\t";
+            for(int i = 0; i < l+1; i++) std::cout << "\t";
             std::cout << '[' << token.type << ',' << token.value  << ']' << std::endl;
         }
     }
 
     if(node.subNodes.size()){
-        for(int i = 0; i < l; i++) std::cout << "\t";
-        std::cout << "SubNodes: \n";
+        for(int i = 0; i < l+1; i++) std::cout << "\t";
+        std::cout << "--\n";
         for(auto& subnode : node.subNodes){
             DispNode(subnode,l+1);
         }
     }
+
+    for(int i = 0; i < l; i++) std::cout << "\t";
+    std::cout << "}\n";
 }
 
 /*-----------------------------------------------------------------------------
@@ -106,6 +108,8 @@ int main(){
     //generate tokens
     std::vector<Token> tokens = tokenize(input);
 
+    std::cout << std::endl << std::endl;
+    std::cout << "Tokens: \n";
     for(auto& token : tokens){
         std::cout << '[' << token.type << ',' << token.value  << ']' << std::endl;
     }
@@ -114,6 +118,7 @@ int main(){
     Parser parser;
     ParseNode exp = parser.parse(tokens.begin());
 
+    std::cout << std::endl << std::endl << "Parsed Tree:\n";
     DispNode(exp);
     in.close();
     return 0;
