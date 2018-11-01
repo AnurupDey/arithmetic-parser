@@ -1,66 +1,16 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <cctype>
 
+#include "Lexer.h"
 #include "Parser.h"
 
 /*-----------------------------------------------------------------------------
-Helper function to extract numbers from an input string. Will Extract decimal 
-numbers with a decimal point. EX: /*[0-9].*[0-9]/
+Helper function to display the subtree represented by node. 
 PARAMETERS:
-[IN]    curChar -   pointer to the location in the string the number starts.
-                    Note that this pointer gets modified.
-RETURNS:
-        number  -   a string containing just the number extracted.
-    Also, curChar will point to the last digit of the number once the function
-    returns.
+[IN]    node    -   node representing the subtree to display
+[IN]    l       -   level of indentation to display at
 -----------------------------------------------------------------------------*/
-std::string getNumberValue(char** curChar){
-    std::string number = "";
-    while((**curChar)!='\0' && (isdigit(**curChar) || (**curChar) == '.')){
-        number += **curChar;
-        (*curChar)++;
-    }
-    (*curChar)--;
-    return number;
-}
-
-/*-----------------------------------------------------------------------------
-This is the whole Lexer. Converts a stream of characters representing the input
-expression into a sequence of tokens.
-PARAMETERS:
-[IN]    input   -   string containing an arithmetic expression as input.
-RETURNS:
-        tokens  -   the stream of tokenized input.
-Each Token contains information about what type of token that is and what the 
-contents/value of the token is.
------------------------------------------------------------------------------*/
-std::vector<Token> tokenize(std::string input){
-    std::vector<Token> tokens;
-
-    if(input.length() == 0 ) return tokens;
-    
-    for(char* curChar = &input[0]; *curChar != '\0'; curChar++){
-        if(isdigit(*curChar))
-        {
-            tokens.emplace_back(TTNUMBER,getNumberValue(&curChar));
-        } 
-        else if (*curChar == '+' || *curChar == '-' || 
-                 *curChar == '*' || *curChar == '/')
-        {
-            tokens.emplace_back(TTOPERATOR,std::string("")+(*curChar));
-        } 
-        else if (*curChar == '(' || *curChar == ')')
-        {
-            tokens.emplace_back(TTBRACKET,std::string("")+(*curChar));
-        }
-    }
-
-    tokens.emplace_back(TTEND,"");
-    return tokens;
-} 
-
 void DispNode(ParseNode& node, int l = 0){
     for(int i = 0; i < l; i++) std::cout << "\t";
     std::cout << "{\n";
@@ -87,6 +37,13 @@ void DispNode(ParseNode& node, int l = 0){
     std::cout << "}\n";
 }
 
+/*-----------------------------------------------------------------------------
+Solves the expression represented by the given expression Parsed Tree
+PARAMETRS:
+[IN]    node    -   root node to the expression tree to solve
+RETURNS:
+        the result of the arithmetic expression.
+-----------------------------------------------------------------------------*/
 double solve(ParseNode& node){
     if(node.name == "Expression"){
         double sum = solve(node.subNodes[0]); 

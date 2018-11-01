@@ -12,7 +12,7 @@ Simple Parser that Parses Arithmetic Expressions
 
 3. Compile the Code using g++ using the following command:
 
-`g++ ../../src/cpp/main.cpp ../../src/cpp/Parser.cpp -o parser -g`
+`g++ ../../src/cpp/main.cpp ../../src/cpp/Parser.cpp ../../src/cpp/Lexer.cpp -o parser -g`
 
 4. Run the generated binary 'parser'
 
