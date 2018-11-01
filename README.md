@@ -21,6 +21,23 @@ Simple Parser that Parses Arithmetic Expressions
 ## Input
 The program takes its input from `data/input.txt`. You can change the contents of this file to suit your needs.
 
+The parser expects the input expressions to follow the following grammar:
+```
+Expression:
+        Term
+        Term "+" Expression
+        Term "-" Expression
+Term:
+        Factor
+        Factor "*" Term
+        Factor "/" Term
+Factor:
+        floating-point-number
+        "+" floating-point-number
+        "-" floating-point-number
+```
+Anything not expected and the parser is programmed to intentionally crash.
+
 ## Sample Run
 ```
 Buffer: (2*7) - (-8/(3*5--7.008)) + 33.33
